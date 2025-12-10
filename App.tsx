@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
@@ -284,37 +283,8 @@ const App: React.FC = () => {
   const handleUpdateTenant = (t: Tenant) => { setTenants(prev => prev.map(x => x.id === t.id ? t : x)); addAuditLog('Update Tenant', `Updated ${t.name}.`); };
   const handleArchiveTenant = (id: string) => { setTenants(prev => prev.map(t => t.id === id ? { ...t, status: 'archived' } : t)); addAuditLog('Archive Tenant', `Archived ${id}.`); };
 
-  const handleAddApartment = (a: Apartment) => { 
-      setApartments(prev => [...prev, a]); 
-      if(a.tenantId) {
-          setTenants(prev => prev.map(t => t.id === a.tenantId ? { ...t, apartmentId: a.id } : t));
-      }
-      addAuditLog('Add Apartment', `Added ${a.number}.`); 
-  };
-
-  const handleUpdateApartment = (a: Apartment) => { 
-      // We need to look up the OLD apartment state to see if tenant changed
-      const oldApt = apartments.find(x => x.id === a.id);
-      
-      setApartments(prev => prev.map(x => x.id === a.id ? a : x)); 
-      
-      if (oldApt) {
-          setTenants(prev => prev.map(t => {
-                // If this tenant was the old one, and they are no longer the assigned tenant, unassign them
-                if (oldApt.tenantId && t.id === oldApt.tenantId && a.tenantId !== oldApt.tenantId) {
-                    return { ...t, apartmentId: undefined };
-                }
-                // If this tenant is the new one, assign the apartment
-                if (a.tenantId && t.id === a.tenantId) {
-                    return { ...t, apartmentId: a.id };
-                }
-                return t;
-          }));
-      }
-      
-      addAuditLog('Update Apartment', `Updated ${a.number}.`); 
-  };
-
+  const handleAddApartment = (a: Apartment) => { setApartments(prev => [...prev, a]); addAuditLog('Add Apartment', `Added ${a.number}.`); };
+  const handleUpdateApartment = (a: Apartment) => { setApartments(prev => prev.map(x => x.id === a.id ? a : x)); addAuditLog('Update Apartment', `Updated ${a.number}.`); };
   const handleArchiveApartment = (id: string) => { setApartments(prev => prev.map(a => a.id === id ? { ...a, status: 'archived' } : a)); addAuditLog('Archive Apartment', `Archived ${id}.`); };
 
   const handleAddContract = (c: Contract) => { setContracts(prev => [...prev, c]); addAuditLog('Add Contract', `Added Contract ${c.id}.`); };
@@ -394,8 +364,7 @@ const App: React.FC = () => {
           onLogout={handleLogout} 
           language={state.language} 
           theme={state.theme} 
-          onThemeToggle={toggleTheme}
-          ownerSettings={state.ownerSettings} 
+          onThemeToggle={toggleTheme} 
         />
         <AIAssistant language={state.language} contextData={{...getAIContext(), role: 'tenant'}} />
       </>
@@ -480,9 +449,8 @@ const App: React.FC = () => {
             onArchiveReport={handleArchiveReport}
             onRestoreReport={(id) => handleRestoreDeleted({ id, type: 'Report', name: 'Restored Report', action: 'Deleted', originalData: null, date: '', user: '' })} // Simplified for report, restore maps to same
             onDeleteReport={handleDeleteReport}
-            apartments={apartments}
-            tenants={tenants}
             transactions={transactions}
+            tenants={tenants}
           />
         );
       case 'settings':

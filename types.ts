@@ -95,8 +95,6 @@ export interface Contract {
   status: 'active' | 'expired' | 'terminated' | 'archived';
   terms?: string;
   terminationReason?: string;
-  reminderDays?: number;
-  reminderChannel?: 'email' | 'system';
 }
 
 export interface ContractTemplate {
